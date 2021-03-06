@@ -1,0 +1,4 @@
+.idea
+DTMJ.iml
+src/main/docker/DTMJ.war
+target/

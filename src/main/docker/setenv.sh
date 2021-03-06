@@ -1,0 +1,2 @@
+CATALINA_OPTS="-Dcatbase=$CATALINA_HOME -Duser.timezone=UTC"
+export CATALINA_OPTS
