@@ -13,7 +13,7 @@ public class SampleTest
   {
     final String message = "a message!";
     
-    final String expectedStatus = "{\n  \"api status\": \"up\"\n  \"database status\": \"down\"\n  \"message\": a message!\"\n}";
+    final String expectedStatus = "{\n  \"api status\": \"up\"\n  \"database status\": \"down\"\n  \"message\": \"" + message + "\"\n}";
     final String actualStatus = new HealthController().checkHealth(message);
     
     Assert.assertEquals(expectedStatus, actualStatus);
