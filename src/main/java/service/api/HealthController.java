@@ -1,9 +1,15 @@
 package service.api;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.bind.annotation.*;
+import service.exceptions.JSONGenerationException;
 import service.models.Health;
 import service.models.ServiceStatus;
+import service.util.JSONEncoder;
 
 @RestController
 @RequestMapping("/health")
@@ -21,22 +27,16 @@ public class HealthController
     Health health = new Health();
     health.setApiStatus(ServiceStatus.UP);
     
-    StringBuilder result = new StringBuilder("{\n")
-        .append("  \"api status\": \"").append(health.getApiStatus()).append("\"\n")
-        .append("  \"database status\": \"").append(health.getDatabaseStatus()).append("\"\n");
+    health.setMessage(message);
     
-    if (message != null)
+    try
     {
-      // I should probly get a JSON library to do this for me, but this should be good enough for sample code.
-      String jsonMessage = message
-          .replace("\"", "\\\"")
-          .replace("\r", "\\r")
-          .replace("\n", "\\n");
-      result.append("  \"message\": \"").append(jsonMessage).append("\"\n");
+      return JSONEncoder.encode(health);
     }
-    
-    result.append("}");
-    return result.toString();
+    catch (JacksonException e)
+    {
+      throw new JSONGenerationException();
+    }
   }
   
   @RequestMapping(value = "/", method = RequestMethod.GET)

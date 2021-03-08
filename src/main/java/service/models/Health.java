@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class Health
 {
-  ServiceStatus apiStatus = ServiceStatus.DOWN;
-  ServiceStatus databaseStatus = ServiceStatus.DOWN;
+  private ServiceStatus apiStatus = ServiceStatus.DOWN;
+  private ServiceStatus databaseStatus = ServiceStatus.DOWN;
+  private String message = null;
 }
