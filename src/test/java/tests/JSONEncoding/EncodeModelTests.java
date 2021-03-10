@@ -1,17 +1,16 @@
 package tests.JSONEncoding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import service.models.Health;
 import service.models.ServiceStatus;
+import service.util.ModelSerializer;
 
 public class EncodeModelTests
 {
   @Test
-  public void modelGetsEncodedCorrectly() throws JsonProcessingException
+  public void modelGetsEncodedAsJSONCorrectly() throws JsonProcessingException
   {
     ServiceStatus apiStatus = ServiceStatus.UP;
     ServiceStatus dbStatus = ServiceStatus.DOWN;
@@ -22,13 +21,37 @@ public class EncodeModelTests
     health.setDatabaseStatus(dbStatus);
     health.setMessage(message);
     
-    ObjectMapper mapper = Jackson2ObjectMapperBuilder.json().build();
-    
     final String expected = "{\"apiStatus\":\"" + apiStatus +
                             "\",\"databaseStatus\":\"" + dbStatus +
                             "\",\"message\":" + (message == null ? "null" : message) + "}";
-    final String actual = mapper.writeValueAsString(health);
+    final String actual = ModelSerializer.serialize(health, "application/json");
   
+    Assert.assertEquals(expected, actual);
+  }
+  
+  @Test
+  public void modelGetsEncodedAsXMLCorrectly() throws JsonProcessingException
+  {
+    ServiceStatus apiStatus = ServiceStatus.UP;
+    ServiceStatus dbStatus = ServiceStatus.DOWN;
+    String message = "! !";
+    
+    Health health = new Health();
+    health.setApiStatus(apiStatus);
+    health.setDatabaseStatus(dbStatus);
+    health.setMessage(message);
+    
+    String expectedAPIStatus = "<apiStatus>" + health.getApiStatus() + "</apiStatus>";
+    String expectedDatabaseStatus = "<databaseStatus>" + health.getDatabaseStatus() + "</databaseStatus>";
+    String expectedMessage = "<message/>";
+    if (message != null)
+    {
+      expectedMessage = "<message>" + message + "</message>";
+    }
+    
+    final String expected = "<Health>" + expectedAPIStatus + expectedDatabaseStatus + expectedMessage + "</Health>";
+    final String actual = ModelSerializer.serialize(health, "application/xml");
+    
     Assert.assertEquals(expected, actual);
   }
 }

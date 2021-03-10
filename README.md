@@ -56,6 +56,8 @@ If you want to make a copy of DTMJ to use for your own Java-based API, you'll pr
 * `./src/main/docker/Dockerfile` line 6 (`COPY DTMJ.war $CATALINA_HOME/webapps/`)<br />
 Note that, in paths to files, `.` is the directory that you cloned DTMJ to, and the paths in `pom.xml` are XPaths.
 
+If you change the name of the `service` package, you'll also have to change the second condition in the `service.util.ModelSerializer.objectIsModel` method.
+
 After that, read up on the annotations in my sample HealthController to see how relative paths and request variables and bodies are handled.
 
 ### Licensing

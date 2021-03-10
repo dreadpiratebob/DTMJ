@@ -8,13 +8,15 @@ import org.junit.Test;
 public class SampleTest
 {
   @Test
-  public void test()
+  public void testJSON()
   {
     final String message = "a message!";
     
     final String expectedStatus = "{\"apiStatus\":\"up\",\"databaseStatus\":\"down\",\"message\":\"" + message + "\"}";
-    final String actualStatus = new HealthController().checkHealth(message);
+    final String actualStatus = new HealthController().checkHealth("application/json", message);
     
     Assert.assertEquals(expectedStatus, actualStatus);
   }
+  
+  // XML and plain text tests are excluded here under the assumption that they'll be covered in the EncodeModelTests.
 }

@@ -1,15 +1,12 @@
 package service.api;
 
 import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.bind.annotation.*;
 import service.exceptions.JSONGenerationException;
 import service.models.Health;
 import service.models.ServiceStatus;
-import service.util.JSONEncoder;
+import service.util.ModelSerializer;
 
 @RestController
 @RequestMapping("/health")
@@ -19,10 +16,19 @@ public class HealthController
   (
     value    = "",
     method   = RequestMethod.GET,
-    produces = MediaType.APPLICATION_JSON_VALUE
+    produces =
+    {
+      MediaType.APPLICATION_JSON_VALUE,
+      MediaType.APPLICATION_XML_VALUE,
+      MediaType.TEXT_PLAIN_VALUE
+    }
   )
   @ResponseBody
-  public String checkHealth(@RequestParam(name="message", required=false) String message)
+  public String checkHealth
+    (
+      @RequestHeader(name="accept") String accept,
+      @RequestParam(name="message", required=false) String message
+    )
   {
     Health health = new Health();
     health.setApiStatus(ServiceStatus.UP);
@@ -31,7 +37,7 @@ public class HealthController
     
     try
     {
-      return JSONEncoder.encode(health);
+      return ModelSerializer.serialize(health, accept);
     }
     catch (JacksonException e)
     {
@@ -41,8 +47,12 @@ public class HealthController
   
   @RequestMapping(value = "/", method = RequestMethod.GET)
   @ResponseBody
-  public String checkHealthWithASlash(@RequestParam(name="message", required=false, defaultValue = "") String message)
+  public String checkHealthWithASlash
+    (
+      @RequestHeader(name="accept") String accept,
+      @RequestParam(name="message", required=false) String message
+    )
   {
-    return checkHealth(message);
+    return checkHealth(accept, message);
   }
 }
