@@ -2,17 +2,20 @@ package service.api;
 
 import com.fasterxml.jackson.core.JacksonException;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import service.exceptions.InvalidAcceptHeaderException;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import service.exceptions.JSONGenerationException;
-import service.exceptions.MissingAcceptHeaderException;
 import service.models.Health;
 import service.models.HealthMessageData;
 import service.models.HealthMessageResponse;
 import service.models.ServiceStatus;
 import service.util.ModelSerializer;
 
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/health")
@@ -53,7 +56,7 @@ public class HealthController
   
   @RequestMapping
     (
-      value    = "",
+      value    = "/",
       method   = RequestMethod.GET,
       produces =
         {
