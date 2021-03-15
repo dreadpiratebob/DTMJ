@@ -19,16 +19,16 @@ import java.util.Locale;
 public class HealthController
 {
   @RequestMapping
-  (
-    value    = "",
-    method   = RequestMethod.GET,
-    produces =
-    {
-      MediaType.APPLICATION_JSON_VALUE,
-      MediaType.APPLICATION_XML_VALUE,
-      MediaType.TEXT_PLAIN_VALUE
-    }
-  )
+    (
+      value    = "",
+      method   = RequestMethod.GET,
+      produces =
+      {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.APPLICATION_XML_VALUE,
+        MediaType.TEXT_PLAIN_VALUE
+      }
+    )
   @ResponseBody
   public String checkHealth
     (
@@ -51,7 +51,17 @@ public class HealthController
     }
   }
   
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping
+    (
+      value    = "",
+      method   = RequestMethod.GET,
+      produces =
+        {
+          MediaType.APPLICATION_JSON_VALUE,
+          MediaType.APPLICATION_XML_VALUE,
+          MediaType.TEXT_PLAIN_VALUE
+        }
+    )
   @ResponseBody
   public String checkHealthWithASlash
     (
