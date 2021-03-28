@@ -1,30 +1,58 @@
 package tests.JSONEncoding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.joda.time.DateTime;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import service.exceptions.NotImplementedException;
 import service.models.Health;
 import service.models.ServiceStatus;
 import service.util.ModelSerializer;
+import tests.JSONEncoding.models.TestModel;
+import tests.JSONEncoding.models.TestSubModel;
 
 public class SerializeModelTests
 {
+  private static final String timeStr = "2020-02-02T02:02:02.000Z";
+  
+  private TestModel test;
+  private TestSubModel data;
+  
+  @Before
+  public void init()
+  {
+    String datum = "asdfasdf";
+    DateTime timestamp = (timeStr == null ? null : DateTime.parse(timeStr));
+    ServiceStatus status = ServiceStatus.UP;
+  
+    data = new TestSubModel();
+    data.setDatum(datum);
+    data.setDateTime(timestamp);
+    data.setStatus(status);
+  
+    test = new TestModel();
+    test.setName("test name.");
+    test.setValue(2);
+    test.setData(data);
+  }
+  
   @Test
   public void modelGetsSerializedAsJSONCorrectly() throws JsonProcessingException
   {
-    ServiceStatus apiStatus = ServiceStatus.UP;
-    ServiceStatus dbStatus = ServiceStatus.DOWN;
-    String message = null;
+    String dataString = "\"data\":null";
+    if (test.getData() != null)
+    {
+      dataString = "\"data\":{" +
+                   "\"datum\":" + getStringFromNullableValue(test.getData().getDatum()) +
+                   ",\"dateTime\":" + getStringFromNullableValue(timeStr) +
+                   ",\"status\":" + getStringFromNullableValue(test.getData().getStatus()) + "}";
+    }
     
-    Health health = new Health();
-    health.setApiStatus(apiStatus);
-    health.setDatabaseStatus(dbStatus);
-    health.setMessage(message);
-    
-    final String expected = "{\"apiStatus\":\"" + apiStatus +
-                            "\",\"databaseStatus\":\"" + dbStatus +
-                            "\",\"message\":" + (message == null ? "null" : message) + "}";
-    final String actual = ModelSerializer.serialize(health, "application/json");
+    final String expected = "{\"name\":" + getStringFromNullableValue(test.getName()) +
+                            ",\"value\":" + test.getValue() +
+                            "," + dataString + "}";
+    final String actual = ModelSerializer.serialize(test, "application/json");
   
     Assert.assertEquals(expected, actual);
   }
@@ -32,25 +60,22 @@ public class SerializeModelTests
   @Test
   public void modelGetsSerializedAsXMLCorrectly() throws JsonProcessingException
   {
-    ServiceStatus apiStatus = ServiceStatus.UP;
-    ServiceStatus dbStatus = ServiceStatus.DOWN;
-    String message = "! !";
-    
-    Health health = new Health();
-    health.setApiStatus(apiStatus);
-    health.setDatabaseStatus(dbStatus);
-    health.setMessage(message);
-  
-    String expectedAPIStatus = "<apiStatus>" + health.getApiStatus() + "</apiStatus>";
-    String expectedDatabaseStatus = "<databaseStatus>" + health.getDatabaseStatus() + "</databaseStatus>";
-    String expectedMessage = "<message/>";
-    if (message != null)
+    String dataString = "<data/>";
+    if (test.getData() != null)
     {
-      expectedMessage = "<message>" + message + "</message>";
+      dataString = "<data>" +
+                     getXMLStringFromNullableValue("datum",    test.getData().getDatum()) +
+                     getXMLStringFromNullableValue("dateTime", timeStr) +
+                     getXMLStringFromNullableValue("status",   test.getData().getStatus()) +
+                   "</data>";
     }
   
-    final String expected = "<Health>" + expectedAPIStatus + expectedDatabaseStatus + expectedMessage + "</Health>";
-    final String actual = ModelSerializer.serialize(health, "application/xml");
+    final String expected = "<TestModel>" +
+                              getXMLStringFromNullableValue("name", test.getName()) +
+                              getXMLStringFromNullableValue("value", test.getValue()) +
+                              dataString +
+                            "</TestModel>";
+    final String actual = ModelSerializer.serialize(test, "application/xml");
   
     Assert.assertEquals(expected, actual);
   }
@@ -58,18 +83,28 @@ public class SerializeModelTests
   @Test
   public void modelGetsDeserializedFromJSONCorrectly() throws JsonProcessingException
   {
-    ServiceStatus apiStatus = ServiceStatus.UP;
-    ServiceStatus dbStatus = ServiceStatus.DOWN;
-    String message = "!!!";
+    String name = "a name";
+    Integer value = 42;
     
-    String json = "{\"apiStatus\":\"" + apiStatus + "\",\"databaseStatus\":\"" + dbStatus + "\",\"message\":\"" + message + "\"}";
+    String datum = "some dataish things";
+    DateTime dateTime = DateTime.now();
+    ServiceStatus status = ServiceStatus.UP;
     
-    Health expected = new Health();
-    expected.setApiStatus(apiStatus);
-    expected.setDatabaseStatus(dbStatus);
-    expected.setMessage(message);
+    TestSubModel data = new TestSubModel();
+    data.setDatum(datum);
+    data.setDateTime(dateTime);
+    data.setStatus(status);
     
-    Health actual = ModelSerializer.deserialize(json, Health.class, "application/json");
+    TestModel expected = new TestModel();
+    expected.setName(name);
+    expected.setValue(value);
+    expected.setData(data);
+    
+    String dateTimeStr = dateTime.toString(ModelSerializer.getDateTimeFormatter());
+    String json = "{\"name\":\"" + name + "\",\"value\":\"" + value + "\",\"data\":{\"datum\":\"" + datum +
+                  "\",\"dateTime\":\"" + dateTimeStr + "\",\"status\":\"" + status.toString() + "\"}}";
+    
+    TestModel actual = ModelSerializer.deserialize(json, TestModel.class, "application/json");
     
     Assert.assertEquals(expected, actual);
   }
@@ -77,19 +112,53 @@ public class SerializeModelTests
   @Test
   public void modelGetsDeserializedFromXMLCorrectly() throws JsonProcessingException
   {
-    ServiceStatus apiStatus = ServiceStatus.UP;
-    ServiceStatus dbStatus = ServiceStatus.DOWN;
-    String message = "!!!";
-    
-    String xml = "<Health><apiStatus>" + apiStatus + "</apiStatus><databaseStatus>" + dbStatus + "</databaseStatus><message>" + message + "</message></Health>";
-    
-    Health expected = new Health();
-    expected.setApiStatus(apiStatus);
-    expected.setDatabaseStatus(dbStatus);
-    expected.setMessage(message);
-    
-    Health actual = ModelSerializer.deserialize(xml, Health.class, "application/xml");
-    
+    String name = "a name";
+    Integer value = 42;
+  
+    String datum = "some dataish things";
+    DateTime dateTime = DateTime.now();
+    ServiceStatus status = ServiceStatus.UP;
+  
+    TestSubModel data = new TestSubModel();
+    data.setDatum(datum);
+    data.setDateTime(dateTime);
+    data.setStatus(status);
+  
+    TestModel expected = new TestModel();
+    expected.setName(name);
+    expected.setValue(value);
+    expected.setData(data);
+  
+    String dateTimeStr = dateTime.toString(ModelSerializer.getDateTimeFormatter());
+    String xml = "<TestModel><name>" + name + "</name><value>" + value + "</value><data><datum>" + datum + "</datum><dateTime>" + dateTimeStr + "</dateTime><status>" + status.toString() + "</status></data></TestModel>";
+  
+    TestModel actual = ModelSerializer.deserialize(xml, TestModel.class, "application/xml");
+  
     Assert.assertEquals(expected, actual);
+  }
+  
+  private String getStringFromNullableValue(Object value)
+  {
+    if (value == null)
+    {
+      return "null";
+    }
+    
+    return "\"" + value.toString() + "\"";
+  }
+  
+  private String getXMLStringFromNullableValue(String name, Object value)
+  {
+    if (value == null)
+    {
+      return "<" + name + "/>";
+    }
+    
+    if (ModelSerializer.objectIsModel(value) && !value.getClass().isEnum())
+    {
+      throw new NotImplementedException();
+    }
+    
+    return "<" + name + ">" + value.toString() + "</" + name + ">";
   }
 }
