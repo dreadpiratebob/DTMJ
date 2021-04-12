@@ -13,7 +13,7 @@ public class SampleTest
   {
     final String message = "a message!";
     
-    final String expectedStatus = "{\"apiStatus\":\"up\",\"databaseStatus\":\"down\",\"message\":\"" + message + "\"}";
+    final String expectedStatus = "{\"apiStatus\":\"up\",\"databaseStatus\":\"down\",\"propertiesAreAccessible\":false,\"message\":\"" + message + "\"}";
     final String actualStatus = new HealthController().checkHealth("application/json", message);
     
     Assert.assertEquals(expectedStatus, actualStatus);

@@ -45,9 +45,12 @@ public class HealthController
       @RequestParam(name="message", required=false) String message
     )
   {
+    String demoProperty = env == null ? null : env.getProperty("demo.property");
+    
     Health health = new Health();
     health.setApiStatus(ServiceStatus.UP);
     
+    health.setPropertiesAreAccessible("demo.value".equals(demoProperty));
     health.setMessage(message);
     
     try
