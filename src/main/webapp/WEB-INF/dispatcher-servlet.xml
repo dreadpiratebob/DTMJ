@@ -7,8 +7,8 @@
    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
     <context:component-scan       base-package="service" />
-    <context:property-placeholder location="classpath:config/application.properties" ignore-resource-not-found="false" />
-    <context:property-placeholder location="classpath:config/https.properties"       ignore-resource-not-found="false" />
+    <context:property-placeholder location="classpath:config/application.properties" ignore-resource-not-found="true" />
+    <context:property-placeholder location="classpath:config/https.properties"       ignore-resource-not-found="true" />
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF" />
