@@ -11,6 +11,7 @@ FROM tomcat:9-jdk16-openjdk-buster
 
 
 RUN mkdir -p /mnt/libraries/
+RUN mkdir -p /mnt/certs/
 RUN mkdir -p $CATALINA_HOME/bin/
 
 RUN rm $CATALINA_HOME/conf/server.xml
