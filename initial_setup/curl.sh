@@ -1,0 +1,1 @@
+curl https://localhost:1333/DTMJ/health/

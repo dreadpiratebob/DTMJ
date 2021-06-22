@@ -21,7 +21,7 @@ import service.util.ModelSerializer;
 
 @RestController
 @RequestMapping("/health")
-@PropertySource("classpath:config/application.properties")
+@PropertySource({"classpath:config/application.properties", "classpath:config/https.properties"})
 public class HealthController
 {
   @Autowired

@@ -1,6 +1,5 @@
 package tests.api;
 
-import org.junit.Ignore;
 import service.api.HealthController;
 
 import org.junit.Assert;
